@@ -2,7 +2,7 @@ type cell = Black | White | Unknown
 type row = cell list
 type grid = row list
 
-type run_range = { start_pos : int; end_pos : int; length : int }
+type run_range = {  start_pos : int;  end_pos : int; length : int }
 
 
 let rec list_init n f =
@@ -181,29 +181,42 @@ let rule_1_5_part2 run_ranges row =
 
 
 (* Rule 2.1: Adjust ranges based on sequence constraints *)
-let rule_2_1 run_ranges row =
+let rule_2_1 run_ranges =
   let rec adjust_ranges ranges =
     match ranges with
     | [] -> []
     | [last] -> [last]
-    | first :: (second :: _ as rest) ->
+    | first :: (second :: rest) ->
         let new_first = 
-          { first with end_pos = min first.end_pos (second.start_pos - second.length - 1) }
+          { first with end_pos = min first.end_pos (second.end_pos - second.length - 1) }
         in
         let new_second = 
-          { second with start_pos = max second.start_pos (new_first.end_pos + new_first.length + 1) }
+          { second with start_pos = max second.start_pos (new_first.start_pos + new_first.length + 1) }
         in
-        new_first :: adjust_ranges (new_second :: List.tl rest)
+        new_first :: adjust_ranges (new_second :: rest)
   in
   adjust_ranges run_ranges
 
+
 (* Rule 2.2: Adjust ranges based on adjacent colored cells *)
 let rule_2_2 run_ranges row =
-  List.map (fun run ->
-      let start = if List.nth row run.start_pos = Black then run.start_pos + 1 else run.start_pos in
-      let end_pos = if List.nth row run.end_pos = Black then run.end_pos - 1 else run.end_pos in
-      { run with start_pos = start; end_pos = end_pos }
-    ) run_ranges
+  List.map (fun run_range ->
+    let new_start =
+      if run_range.start_pos > 0 && List.nth row (run_range.start_pos - 1) = Black then
+        run_range.start_pos + 1
+      else
+        run_range.start_pos
+    in
+    let new_end =
+      if run_range.end_pos < List.length row - 1 && List.nth row (run_range.end_pos + 1) = Black then
+        run_range.end_pos - 1
+      else
+        run_range.end_pos
+    in
+    { run_range with start_pos = new_start; end_pos = new_end }
+  ) run_ranges
+
+
 
 (* Rule 2.3: Refine ranges for overlapping black segments *)
 let rule_2_3 run_ranges row =

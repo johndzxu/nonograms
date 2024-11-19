@@ -68,7 +68,7 @@ let test_rule_1_5_part2 () =
 
     (* List of tests *)
 let () =
-  Alcotest.run ~verbose:true "Rules Tests" [
+  Alcotest.run ~verbose:false "Rules Tests" [
     "Rule 1.1", [ "", `Quick, test_rule_1_1 ];
     "Rule 1.2", [ "", `Quick, test_rule_1_2 ];
     "Rule 1.3", [ "", `Quick, test_rule_1_3 ];

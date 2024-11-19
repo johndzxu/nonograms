@@ -1,8 +1,7 @@
-[33mASSERT[0m Rule 2.2 adjusts ranges based on adjacent cells
-[31mFAIL[0m Rule 2.2 adjusts ranges based on adjacent cells
 
-   Expected: `[32m[{ start_pos = 1; end_pos = 3; length = 3 }][0m'
-   Received: `[31m[{ start_pos = 0; end_pos = 4; length = 3 }][0m'
+   Expected: `[32m[ Unknown Unknown White Black Unknown Unknown Unknown Unknown Unknown Unknown ][0m'
+
+   Received: `[31m[ Unknown Unknown Unknown Black White Unknown Unknown Unknown Unknown Unknown ][0m'
 
 Raised at Alcotest_engine__Test.check in file "src/alcotest-engine/test.ml", line 203, characters 4-261
 Called from Alcotest_engine__Core.Make.protect_test.(fun) in file "src/alcotest-engine/core.ml", line 186, characters 17-23
