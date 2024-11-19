@@ -55,8 +55,21 @@ let rec verify_col (grid: grid) (clues: int list) i =
 ;;
 
 (* A helper function to initialize a grid with unknown cells *)
-let initialize_grid rows cols =
-  Array.make_matrix rows cols Unknown
+let init_grid rows cols =
+  let rec init_row (row: cell list) (cols: int): cell list =
+    match cols with
+    | 0 -> row
+    | _ -> init_row (Unknown::row) (cols-1)
+  in
+
+  let rec init_grid' (row: cell list) (grid: row list) (rows: int) =
+    match rows with
+    | 0 -> grid
+    | _ -> init_grid' row (row::grid) (rows-1)
+  in
+
+  let row = init_row [] cols in
+  init_grid' row [] rows
 
 (* Utility function to update a cell in a row *)
 let update_row row index value =
