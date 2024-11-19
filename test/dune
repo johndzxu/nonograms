@@ -1,0 +1,9 @@
+(test
+ (name rule_1_tests)
+ (modules rule_1_tests)
+ (libraries rules alcotest))
+
+(test
+ (name rule_2_tests)
+ (modules rule_2_tests)
+ (libraries rules alcotest))

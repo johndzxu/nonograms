@@ -4,16 +4,6 @@ type grid = row list
 
 type run_range = { start_pos : int; end_pos : int; length : int }
 
-let split index grid =
-  let rec aux i acc rest =
-    match rest with
-    | [] -> (List.rev acc, [])
-    | h :: t ->
-        if i = 0 then (List.rev acc, rest)
-        else aux (i - 1) (h :: acc) t
-  in
-  aux index [] grid
-;;
 
 let rec list_init n f =
   if n <= 0 then []
@@ -31,28 +21,6 @@ let rev_find_opt predicate lst =
   aux lst
 
 
-let rec verify_col (grid: grid) (clues: int list) i =
-  match clues with 
-  | [] -> List.for_all (fun x -> (List.nth x i = White || List.nth x i = Unknown)) grid
-  | h::t -> 
-      if List.nth (List.hd grid) i = Black then 
-        let (firstk, rest) = split h grid in 
-        if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
-          match rest with 
-          | [] -> (clues = [])
-          | r::rows -> if List.nth r i = White || List.nth r i = Unknown then verify_col rows t i else false
-        ) else false 
-      else if List.nth (List.hd grid) i = White then let r::rows = grid in verify_col rows clues i
-      else
-        (
-          let (firstk, rest) = split h grid in 
-          if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
-            match rest with 
-            | [] -> (clues = [])
-            | r::rows -> if List.nth r i  = White || List.nth r i  = Unknown then verify_col rows t i else false
-          ) else false
-        ) || let r::rows = grid in verify_col rows clues i
-;;
 
 (* A helper function to initialize a grid with unknown cells *)
 let init_grid rows cols =
@@ -143,29 +111,74 @@ let rule_1_4 run_ranges row =
     ) row
 
 (* Rule 1.5: Handle "walls" created by empty cells *)
-let rule_1_5 run_ranges row =
-  List.mapi (fun i cell ->
-      if cell = Black then
-      (* Check for "walls" on both sides and color accordingly *)
-        let rec find_wall idx direction =
-          if idx < 0 || idx >= List.length row then None
-          else match List.nth row idx with
-            | White -> Some idx
-            | _ -> find_wall (idx + direction) direction
-        in
-        let left_wall = find_wall (i - 1) (-1) in
-        let right_wall = find_wall (i + 1) 1 in
-        let expand_left = match left_wall with
-          | Some lw -> i - lw <= List.fold_left (fun min_len run -> min min_len run.length) max_int run_ranges
-          | None -> false
-        in
-        let expand_right = match right_wall with
-          | Some rw -> rw - i <= List.fold_left (fun min_len run -> min min_len run.length) max_int run_ranges
-          | None -> false
-        in
-        if expand_left || expand_right then Black else cell
-      else cell
-    ) row
+let rule_1_5_part1 run_ranges row =
+  List.fold_left (fun updated_row (i, cell) ->
+    if cell = Black then
+      let rec find_wall idx direction =
+        if idx < 0 || idx >= List.length updated_row then None
+        else match List.nth updated_row idx with
+          | White -> Some idx
+          | _ -> find_wall (idx + direction) direction
+      in
+      let left_wall = find_wall (i - 1) (-1) in
+      let right_wall = find_wall (i + 1) 1 in
+      let expand_left = match left_wall with
+        | Some lw -> i - lw <= List.fold_left (fun min_len run -> min min_len run.length) max_int run_ranges
+        | None -> false
+      in
+      let expand_right = match right_wall with
+        | Some rw -> rw - i <= List.fold_left (fun min_len run -> min min_len run.length) max_int run_ranges
+        | None -> false
+      in
+      let row_with_left = if expand_left && i + 1 < List.length updated_row then update_row updated_row (i + 1) Black else updated_row in
+      let row_with_both = if expand_right && i - 1 >= 0 then update_row row_with_left (i - 1) Black else row_with_left in
+      row_with_both
+    else
+      updated_row
+  ) row (List.mapi (fun i cell -> (i, cell)) row)
+
+  (* Helper function to find a black segment containing a given index *)
+let find_segment row index =
+  let rec find_start idx =
+    if idx < 0 || List.nth row idx <> Black then idx + 1
+    else find_start (idx - 1)
+  in
+  let rec find_end idx =
+    if idx >= List.length row || List.nth row idx <> Black then idx - 1
+    else find_end (idx + 1)
+  in
+  let start = find_start index in
+  let finish = find_end index in
+  (start, finish)
+
+(* Helper function to get all black runs covering a specific index *)
+let runs_covering_index index run_ranges =
+  List.filter (fun run -> run.start_pos <= index && index <= run.end_pos) run_ranges
+
+(* Rule 1.5 (second part) implementation *)
+let rule_1_5_part2 run_ranges row =
+  List.fold_left (fun updated_row (i, cell) ->
+    if cell = Black then
+      (* Find the segment containing the current cell *)
+      let (s, e) = find_segment updated_row i in
+      let segment_length = e - s + 1 in
+      (* Find all runs covering this segment *)
+      let covering_runs = runs_covering_index i run_ranges in
+      let all_same_length =
+        List.for_all (fun run -> run.length = segment_length) covering_runs
+      in
+      if all_same_length then
+        (* Mark cells before s and after e as White if within bounds *)
+        let updated_row = if s - 1 >= 0 then update_row updated_row (s - 1) White else updated_row in
+        let updated_row = if e + 1 < List.length updated_row then update_row updated_row (e + 1) White else updated_row in
+        updated_row
+      else
+        updated_row
+    else
+      updated_row
+  ) row (List.mapi (fun i cell -> (i, cell)) row)
+
+
 
 (* Rule 2.1: Adjust ranges based on sequence constraints *)
 let rule_2_1 run_ranges row =
@@ -246,33 +259,3 @@ let rule_3_3 run_ranges row =
         if List.length overlapping = 1 then Black else cell
       else cell
     ) row
-
-(* Apply all logical rules iteratively *)
-let apply_logical_rules grid run_ranges =
-  let rec iterate grid =
-    (* Apply all rules and determine changes *)
-    let new_grid = grid in
-    (* Apply each rule in sequence *)
-    let new_grid = rule_1_1 run_ranges new_grid in
-    let new_grid = rule_1_2 run_ranges new_grid in
-    let new_grid = rule_1_3 run_ranges new_grid in
-    let new_grid = rule_1_4 run_ranges new_grid in
-    let new_grid = rule_1_5 run_ranges new_grid in
-    let run_ranges = rule_2_1 run_ranges new_grid in
-    let run_ranges = rule_2_2 run_ranges new_grid in
-    let run_ranges = rule_2_3 run_ranges new_grid in
-    let new_grid = rule_3_1 run_ranges new_grid in
-    let run_ranges = rule_3_2 run_ranges new_grid in
-    let new_grid = rule_3_3 run_ranges new_grid in
-    if new_grid = grid then grid else iterate new_grid
-  in
-  iterate grid
-
-(* Backtracking function placeholder *)
-let backtrack grid run_ranges = 
-  failwith "Backtracking not implemented yet"
-
-(* Main solver function *)
-let solve_nonogram grid run_ranges =
-  let logical_solved = apply_logical_rules grid run_ranges in
-  backtrack logical_solved run_ranges

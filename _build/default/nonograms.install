@@ -1,0 +1,11 @@
+lib: [
+  "_build/install/default/lib/nonograms/META"
+  "_build/install/default/lib/nonograms/dune-package"
+  "_build/install/default/lib/nonograms/opam"
+]
+bin: [
+  "_build/install/default/bin/nonograms"
+]
+doc: [
+  "_build/install/default/doc/nonograms/README.md"
+]

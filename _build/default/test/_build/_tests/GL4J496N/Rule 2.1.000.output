@@ -1,0 +1,10 @@
+[33mASSERT[0m Rule 2.1 adjusts ranges correctly
+[31mFAIL[0m Rule 2.1 adjusts ranges correctly
+
+   Expected: `[32m[{ start_pos = 3; end_pos = 5; length = 3 }][0m'
+   Received: `[31m[{ start_pos = 2; end_pos = 6; length = 3 }][0m'
+
+Raised at Alcotest_engine__Test.check in file "src/alcotest-engine/test.ml", line 203, characters 4-261
+Called from Alcotest_engine__Core.Make.protect_test.(fun) in file "src/alcotest-engine/core.ml", line 186, characters 17-23
+Called from Alcotest_engine__Monad.Identity.catch in file "src/alcotest-engine/monad.ml", line 24, characters 31-35
+
