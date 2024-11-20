@@ -91,21 +91,20 @@ let solve_cont row_cls col_cls =
 let solve_all row_cls col_cls =
   let width = List.length col_cls in
   
-  let rec s_row row_cls nono sc =
+  let rec s_row row_cls nono sc depth = 
     match row_cls with 
     | [] -> let nono = List.rev nono in
         if ver_grid nono col_cls then sc [nono] else sc []
-    | cl::cls -> s_stack row_cls nono (all_rows cl width) sc
+    | cl::cls -> s_stack row_cls nono (all_rows cl width) sc (depth+1)
       
-  and s_stack row_cls nono stack sc =
-    let _ = (print_int (List.length stack); print_endline "") in
+  and s_stack row_cls nono stack sc depth = 
     match (stack, row_cls) with 
     | ([], _) -> sc []
     | (x::xs, cl::oth_cls) -> s_row oth_cls (x::nono) 
-                                (fun l -> sc (l@(s_stack row_cls nono xs sc)))
+                                (fun l -> s_stack row_cls nono xs (fun l2 -> sc (l@l2)) depth) depth
     | _ -> sc []
   
-  in s_row row_cls [] (fun a -> a)
+  in s_row row_cls [] (fun a -> a) 0
   
   
                      
