@@ -49,21 +49,64 @@ let rec ver_grid nono clues =
   let clue_cols = List.map2 (fun clue col -> (clue,col)) clues (transpose nono) in
   List.for_all (fun (clue, col) -> ver_col clue col Unknown) clue_cols
   
+(*Solve with Exceptions*)
 let solve row_cls col_cls =
-    let width = List.length col_cls in
-    
-    let rec s_row row_cls col_cls nono = 
-      match row_cls with 
-      | [] -> let nono = List.rev nono in 
-          if ver_grid nono col_cls then nono else raise Fail
-      | cl::cls -> s_stack row_cls col_cls nono (all_rows cl width) 
-    and s_stack row_cls col_cls nono stack = 
-      match (stack, row_cls) with 
-      | ([], _) -> raise Fail
-      | (x::xs, cl::oth_cls) ->
-          (try s_row oth_cls col_cls (x::nono) 
-           with Fail -> s_stack row_cls col_cls nono xs)
-      | _-> raise Fail
-              
-    in s_row row_cls col_cls []
+  let width = List.length col_cls in
   
+  let rec s_row row_cls nono = 
+    match row_cls with 
+    | [] -> let nono = List.rev nono in 
+        if ver_grid nono col_cls then nono else raise Fail
+    | cl::cls -> s_stack row_cls nono (all_rows cl width) 
+  and s_stack row_cls nono stack = 
+    match (stack, row_cls) with 
+    | ([], _) -> raise Fail
+    | (x::xs, cl::oth_cls) ->
+        (try s_row oth_cls (x::nono) 
+         with Fail -> s_stack row_cls nono xs)
+    | _-> raise Fail
+            
+  in s_row row_cls []
+  
+(* Solve with fail continuation *)
+let solve_cont row_cls col_cls =
+  let width = List.length col_cls in
+  
+  let rec s_row row_cls nono fc =
+    match row_cls with 
+    | [] -> let nono = List.rev nono in
+        if ver_grid nono col_cls then nono else fc ()
+    | cl::cls -> s_stack row_cls nono (all_rows cl width) fc
+      
+  and s_stack row_cls nono stack fc =
+    match (stack, row_cls) with
+    | ([], _) -> fc ()
+    | (x::xs, cl::oth_cls) -> s_row oth_cls (x::nono) 
+                                (fun () -> s_stack row_cls nono xs fc)
+    | _ -> fc ()
+      
+  in s_row row_cls [] (fun () -> raise Fail)
+  
+(*Find ALL solutions with success continuation*)
+let solve_all row_cls col_cls =
+  let width = List.length col_cls in
+  
+  let rec s_row row_cls nono sc =
+    match row_cls with 
+    | [] -> let nono = List.rev nono in
+        if ver_grid nono col_cls then sc [nono] else sc []
+    | cl::cls -> s_stack row_cls nono (all_rows cl width) sc
+      
+  and s_stack row_cls nono stack sc =
+    let _ = (print_int (List.length stack); print_endline "") in
+    match (stack, row_cls) with 
+    | ([], _) -> sc []
+    | (x::xs, cl::oth_cls) -> s_row oth_cls (x::nono) 
+                                (fun l -> sc (l@(s_stack row_cls nono xs sc)))
+    | _ -> sc []
+  
+  in s_row row_cls [] (fun a -> a)
+  
+  
+                     
+    
