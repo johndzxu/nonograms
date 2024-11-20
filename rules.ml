@@ -402,7 +402,7 @@ let initialize_run_ranges row row_clues =
 
   (* Helper function to calculate the sum of (LB_i + 1) for given range *)
   let sum_clues_with_gaps clues from_idx to_idx =
-    List.fold_left (fun acc i -> acc + List.nth clues i + 1) 0 (List.init (to_idx - from_idx + 1) (fun i -> from_idx + i))
+    List.fold_left (fun acc i -> acc + List.nth clues i + 1) 0 (list_init (to_idx - from_idx + 1) (fun i -> from_idx + i))
   in
 
   (* Compute each run's start and end positions *)
@@ -446,6 +446,11 @@ let apply_rules_rows (grid: row list) (clues: int list list): grid =
   let new_grid = (List.map2 apply_rules_row grid run_ranges_grid) in
   new_grid
 
+let gen_list n e =
+  let rec gen' n cont = 
+    match n with
+    | 0 -> cont []
+    | _ -> gen' (n-1) (fun l -> cont (e::l)) in gen' n (fun a -> a) 
 let transpose nono = 
   let len = List.length (List.hd nono) in
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
