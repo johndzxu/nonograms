@@ -77,6 +77,8 @@ let rule_1_3 run_ranges row =
   (* Iterate through all black runs *)
   List.fold_left (fun updated_row run ->
     let updated_row =
+      if (List.nth updated_row run.start_pos) != Black
+      then updated_row else
       if run.start_pos > 0 then
         let covering_runs = runs_covering_cell run.start_pos run in
         let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
@@ -88,6 +90,8 @@ let rule_1_3 run_ranges row =
         updated_row
     in
 
+    if (List.nth updated_row run.end_pos) != Black
+    then updated_row else
     if run.end_pos < List.length row - 1 then
       let covering_runs = runs_covering_cell run.end_pos run in
       let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
