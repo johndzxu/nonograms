@@ -1,4 +1,4 @@
-# dune exec nonograms
+# dune runtest
 # OCAMLPARAM: unset
 # Shared cache: disabled
 # Shared cache location: /home/johnd/.cache/dune/db
@@ -13,4 +13,140 @@
 #  ; build_dir = In_build_dir "default"
 #  ; instrument_with = []
 #  }
-$ /usr/bin/ocamlc.opt -config > /tmp/dune_a50494_output
+$ /usr/bin/ocamlc.opt -config > /tmp/dune_98fc92_output
+$ (cd _build/default && /usr/bin/ocamlc.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I lib/.rules.objs/byte -no-alias-deps -opaque -o lib/.rules.objs/byte/rules.cmo -c -impl lib/rules.ml)
+> File "lib/rules.ml", line 321, characters 4-12:
+> 321 | let rule_3_2 run_ranges row =
+>           ^^^^^^^^
+> Warning 32 [unused-value-declaration]: unused value rule_3_2.
+> File "lib/rules.ml", line 358, characters 15-18:
+> 358 |       else let run = {run with start_pos = start_i} in i
+>                      ^^^
+> Warning 26 [unused-var]: unused variable run.
+> File "lib/rules.ml", line 365, characters 15-18:
+> 365 |       else let run = {run with end_pos = end_i} in i
+>                      ^^^
+> Warning 26 [unused-var]: unused variable run.
+> File "lib/rules.ml", line 372, characters 10-22:
+> 372 |       let new_segments = (List.filteri (fun i _ -> i >= start_i && i <= end_i) segments) in
+>                 ^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_segments.
+> File "lib/rules.ml", line 391, characters 26-30:
+> 391 |       List.fold_left (fun cell (i, cell) ->
+>                                 ^^^^
+> Warning 27 [unused-var-strict]: unused variable cell.
+> File "lib/rules.ml", line 391, characters 35-39:
+> 391 |       List.fold_left (fun cell (i, cell) ->
+>                                          ^^^^
+> Warning 27 [unused-var-strict]: unused variable cell.
+> File "lib/rules.ml", line 427, characters 8-22:
+> 427 |     let new_run_ranges = rule_2_1 run_ranges in
+>               ^^^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_run_ranges.
+> File "lib/rules.ml", line 429, characters 8-22:
+> 429 |     let new_run_ranges = rule_2_3 run_ranges new_grid in
+>               ^^^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_run_ranges.
+$ (cd _build/default && /usr/bin/ocamlc.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I test/.rule_1_tests.eobjs/byte -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -no-alias-deps -opaque -o test/.rule_1_tests.eobjs/byte/dune__exe__Rule_1_tests.cmi -c -intf test/rule_1_tests.mli)
+$ (cd _build/default && /usr/bin/ocamlc.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I test/.rule_2_tests.eobjs/byte -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -no-alias-deps -opaque -o test/.rule_2_tests.eobjs/byte/dune__exe__Rule_2_tests.cmi -c -intf test/rule_2_tests.mli)
+$ (cd _build/default && /usr/bin/ocamlc.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I test/.rule_3_tests.eobjs/byte -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -no-alias-deps -opaque -o test/.rule_3_tests.eobjs/byte/dune__exe__Rule_3_tests.cmi -c -intf test/rule_3_tests.mli)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -I test/.rule_2_tests.eobjs/byte -I test/.rule_2_tests.eobjs/native -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -I lib/.rules.objs/native -intf-suffix .ml -no-alias-deps -opaque -o test/.rule_2_tests.eobjs/native/dune__exe__Rule_2_tests.cmx -c -impl test/rule_2_tests.ml)
+> File "test/rule_2_tests.ml", line 2, characters 0-13:
+> 2 | open Alcotest
+>     ^^^^^^^^^^^^^
+> Warning 33 [unused-open]: unused open Alcotest.
+> File "test/rule_2_tests.ml", line 13, characters 4-13:
+> 13 | let run_range = Alcotest.testable pp_run_range run_range_eq
+>          ^^^^^^^^^
+> Warning 32 [unused-value-declaration]: unused value run_range.
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -I test/.rule_1_tests.eobjs/byte -I test/.rule_1_tests.eobjs/native -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -I lib/.rules.objs/native -intf-suffix .ml -no-alias-deps -opaque -o test/.rule_1_tests.eobjs/native/dune__exe__Rule_1_tests.cmx -c -impl test/rule_1_tests.ml)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -I test/.rule_3_tests.eobjs/byte -I test/.rule_3_tests.eobjs/native -I /home/johnd/.opam/default/lib/alcotest -I /home/johnd/.opam/default/lib/alcotest/engine -I /home/johnd/.opam/default/lib/alcotest/stdlib_ext -I /home/johnd/.opam/default/lib/astring -I /home/johnd/.opam/default/lib/cmdliner -I /home/johnd/.opam/default/lib/fmt -I /home/johnd/.opam/default/lib/re -I /home/johnd/.opam/default/lib/seq -I /home/johnd/.opam/default/lib/stdlib-shims -I /home/johnd/.opam/default/lib/uutf -I lib/.rules.objs/byte -I lib/.rules.objs/native -intf-suffix .ml -no-alias-deps -opaque -o test/.rule_3_tests.eobjs/native/dune__exe__Rule_3_tests.cmx -c -impl test/rule_3_tests.ml)
+> File "test/rule_3_tests.ml", line 2, characters 0-13:
+> 2 | open Alcotest
+>     ^^^^^^^^^^^^^
+> Warning 33 [unused-open]: unused open Alcotest.
+> File "test/rule_3_tests.ml", line 9, characters 4-10:
+> 9 | let pp_row fmt row =
+>         ^^^^^^
+> Warning 32 [unused-value-declaration]: unused value pp_row.
+> File "test/rule_3_tests.ml", line 32, characters 6-18:
+> 32 |   let expected_row = [Unknown; Unknown; Unknown; White; White; White; White; Unknown; Unknown; Unknown; Unknown; Unknown] in
+>            ^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable expected_row.
+> File "test/rule_3_tests.ml", line 35, characters 25-35:
+> 35 |   let result_run_ranges, result_row = rule_3_2 test_run_ranges test_row in
+>                               ^^^^^^^^^^
+> Warning 27 [unused-var-strict]: unused variable result_row.
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -I lib/.rules.objs/byte -I lib/.rules.objs/native -intf-suffix .ml -no-alias-deps -opaque -o lib/.rules.objs/native/rules.cmx -c -impl lib/rules.ml)
+> File "lib/rules.ml", line 321, characters 4-12:
+> 321 | let rule_3_2 run_ranges row =
+>           ^^^^^^^^
+> Warning 32 [unused-value-declaration]: unused value rule_3_2.
+> File "lib/rules.ml", line 358, characters 15-18:
+> 358 |       else let run = {run with start_pos = start_i} in i
+>                      ^^^
+> Warning 26 [unused-var]: unused variable run.
+> File "lib/rules.ml", line 365, characters 15-18:
+> 365 |       else let run = {run with end_pos = end_i} in i
+>                      ^^^
+> Warning 26 [unused-var]: unused variable run.
+> File "lib/rules.ml", line 372, characters 10-22:
+> 372 |       let new_segments = (List.filteri (fun i _ -> i >= start_i && i <= end_i) segments) in
+>                 ^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_segments.
+> File "lib/rules.ml", line 391, characters 26-30:
+> 391 |       List.fold_left (fun cell (i, cell) ->
+>                                 ^^^^
+> Warning 27 [unused-var-strict]: unused variable cell.
+> File "lib/rules.ml", line 391, characters 35-39:
+> 391 |       List.fold_left (fun cell (i, cell) ->
+>                                          ^^^^
+> Warning 27 [unused-var-strict]: unused variable cell.
+> File "lib/rules.ml", line 427, characters 8-22:
+> 427 |     let new_run_ranges = rule_2_1 run_ranges in
+>               ^^^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_run_ranges.
+> File "lib/rules.ml", line 429, characters 8-22:
+> 429 |     let new_run_ranges = rule_2_3 run_ranges new_grid in
+>               ^^^^^^^^^^^^^^
+> Warning 26 [unused-var]: unused variable new_run_ranges.
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -a -o lib/rules.cmxa lib/.rules.objs/native/rules.cmx)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -o test/rule_1_tests.exe lib/rules.cmxa /home/johnd/.opam/default/lib/astring/astring.cmxa /home/johnd/.opam/default/lib/cmdliner/cmdliner.cmxa /home/johnd/.opam/default/lib/uutf/uutf.cmxa /home/johnd/.opam/default/lib/alcotest/stdlib_ext/alcotest_stdlib_ext.cmxa /home/johnd/.opam/default/lib/fmt/fmt.cmxa /home/johnd/.opam/default/lib/fmt/fmt_cli.cmxa /home/johnd/.opam/default/lib/re/re.cmxa /home/johnd/.opam/default/lib/stdlib-shims/stdlib_shims.cmxa /home/johnd/.opam/default/lib/alcotest/engine/alcotest_engine.cmxa /usr/lib/ocaml/unix.cmxa -I /usr/lib/ocaml /home/johnd/.opam/default/lib/fmt/fmt_tty.cmxa /home/johnd/.opam/default/lib/alcotest/alcotest.cmxa -I /home/johnd/.opam/default/lib/alcotest test/.rule_1_tests.eobjs/native/dune__exe__Rule_1_tests.cmx)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -o test/rule_2_tests.exe lib/rules.cmxa /home/johnd/.opam/default/lib/astring/astring.cmxa /home/johnd/.opam/default/lib/cmdliner/cmdliner.cmxa /home/johnd/.opam/default/lib/uutf/uutf.cmxa /home/johnd/.opam/default/lib/alcotest/stdlib_ext/alcotest_stdlib_ext.cmxa /home/johnd/.opam/default/lib/fmt/fmt.cmxa /home/johnd/.opam/default/lib/fmt/fmt_cli.cmxa /home/johnd/.opam/default/lib/re/re.cmxa /home/johnd/.opam/default/lib/stdlib-shims/stdlib_shims.cmxa /home/johnd/.opam/default/lib/alcotest/engine/alcotest_engine.cmxa /usr/lib/ocaml/unix.cmxa -I /usr/lib/ocaml /home/johnd/.opam/default/lib/fmt/fmt_tty.cmxa /home/johnd/.opam/default/lib/alcotest/alcotest.cmxa -I /home/johnd/.opam/default/lib/alcotest test/.rule_2_tests.eobjs/native/dune__exe__Rule_2_tests.cmx)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@31..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -o test/rule_3_tests.exe lib/rules.cmxa /home/johnd/.opam/default/lib/astring/astring.cmxa /home/johnd/.opam/default/lib/cmdliner/cmdliner.cmxa /home/johnd/.opam/default/lib/uutf/uutf.cmxa /home/johnd/.opam/default/lib/alcotest/stdlib_ext/alcotest_stdlib_ext.cmxa /home/johnd/.opam/default/lib/fmt/fmt.cmxa /home/johnd/.opam/default/lib/fmt/fmt_cli.cmxa /home/johnd/.opam/default/lib/re/re.cmxa /home/johnd/.opam/default/lib/stdlib-shims/stdlib_shims.cmxa /home/johnd/.opam/default/lib/alcotest/engine/alcotest_engine.cmxa /usr/lib/ocaml/unix.cmxa -I /usr/lib/ocaml /home/johnd/.opam/default/lib/fmt/fmt_tty.cmxa /home/johnd/.opam/default/lib/alcotest/alcotest.cmxa -I /home/johnd/.opam/default/lib/alcotest test/.rule_3_tests.eobjs/native/dune__exe__Rule_3_tests.cmx)
+$ (cd _build/default/test && ./rule_2_tests.exe)
+> Testing `Rule 2 Tests'.
+> This run has ID `XH4XFXFQ'.
+>
+>   [OK]          Rule 2.1          0   Adjusts ranges based on sequence constraints.
+>   [OK]          Rule 2.2          0   Adjusts ranges based on adjacent cells.
+>   [OK]          Rule 2.3          0   Refines ranges for overlapping segments.
+>
+> Test Successful in 0.000s. 3 tests run.
+> ASSERT Rule 2.1 adjusts ranges correctly
+> ASSERT Rule 2.2 adjusts ranges based on adjacent cells
+> ASSERT Rule 2.3 refines ranges for overlapping segments
+$ (cd _build/default/test && ./rule_1_tests.exe)
+> Testing `Rule 1 Tests'.
+> This run has ID `N5QSF380'.
+>
+>   [OK]          Rule 1.1            0   
+>   [OK]          Rule 1.2            0   
+>   [OK]          Rule 1.3            0   
+>   [OK]          Rule 1.4            0   
+>   [OK]          Rule 1.5 1          0   
+>   [OK]          Rule 1.5 2          0   
+>
+> Full test results in `~/code/nonograms/_build/default/test/_build/_tests/Rule 1 Tests'.
+> Test Successful in 0.001s. 6 tests run.
+$ (cd _build/default/test && ./rule_3_tests.exe)
+> Testing `Rule 3 Tests'.
+> This run has ID `I51SEVIN'.
+>
+>   [OK]          Rule 3.1          0   Fill scattered black cells and update ranges.
+>   [OK]          Rule 3.2          0   
+>
+> Test Successful in 0.000s. 2 tests run.
+> ASSERT Rule 3.1 updates row
+> ASSERT Rule 3.1 updates ranges
+> ASSERT Rule 3.2 updates ranges
