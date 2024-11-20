@@ -392,3 +392,27 @@ let rule_3_3 run_ranges row =
         if List.length overlapping = 1 then Black else cell
       else cell
     ) row
+
+
+let apply_logical_rules grid run_ranges =
+  let rec iterate grid =
+    (* Apply all rules and determine changes *)
+    let new_grid = grid in
+    (* Apply each rule in sequence *)
+    let new_grid = rule_1_1 run_ranges new_grid in
+    let new_grid = rule_1_2 run_ranges new_grid in
+    let new_grid = rule_1_3 run_ranges new_grid in
+    let new_grid = rule_1_4 run_ranges new_grid in
+    let new_grid = rule_1_5_part1 run_ranges new_grid in
+    let new_grid = rule_1_5_part2 run_ranges new_grid in
+    let new_run_ranges = rule_2_1 run_ranges in
+    let new_run_ranges = rule_2_2 run_ranges new_grid in
+    let new_run_ranges = rule_2_3 run_ranges new_grid in
+    let (new_run_ranges, new_grid) = rule_3_1 run_ranges new_grid in
+  (*  let run_ranges = rule_3_2 run_ranges new_grid in
+    let new_grid = rule_3_3 run_ranges new_grid in *)
+    if new_grid = grid && new_run_ranges = run_ranges
+      then (grid, run_ranges)
+      else iterate new_grid
+  in
+  iterate grid
