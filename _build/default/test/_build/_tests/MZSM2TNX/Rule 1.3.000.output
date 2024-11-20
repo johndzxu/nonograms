@@ -1,9 +1,0 @@
-
-   Expected: `[32m[ Unknown Unknown White Black Unknown Unknown Unknown Unknown Unknown Unknown ][0m'
-
-   Received: `[31m[ Unknown Unknown Unknown Black White Unknown Unknown Unknown Unknown Unknown ][0m'
-
-Raised at Alcotest_engine__Test.check in file "src/alcotest-engine/test.ml", line 203, characters 4-261
-Called from Alcotest_engine__Core.Make.protect_test.(fun) in file "src/alcotest-engine/core.ml", line 186, characters 17-23
-Called from Alcotest_engine__Monad.Identity.catch in file "src/alcotest-engine/monad.ml", line 24, characters 31-35
-

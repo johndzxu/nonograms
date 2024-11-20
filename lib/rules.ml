@@ -67,20 +67,38 @@ let rule_1_2 run_ranges row =
 
 (* Rule 1.3: Handle edge cases with length-1 black runs *)
 let rule_1_3 run_ranges row =
-  List.fold_left (fun acc_range run ->
-      if run.length = 1 then
-        let acc_range = if List.nth acc_range run.start_pos = Black then
-            update_row acc_range (run.start_pos - 1) White
-          else
-            acc_range
-        in
-        if List.nth acc_range run.end_pos = Black then
-          update_row acc_range (run.end_pos + 1) White
+  (* Helper function to find runs covering a specific cell, excluding a specific run *)
+  let runs_covering_cell index exclude_run =
+    List.filter (fun run ->
+      run.start_pos <= index && index <= run.end_pos && run != exclude_run
+    ) run_ranges
+  in
+
+  (* Iterate through all black runs *)
+  List.fold_left (fun updated_row run ->
+    let updated_row =
+      if run.start_pos > 0 then
+        let covering_runs = runs_covering_cell run.start_pos run in
+        let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
+        if covering_runs != [] && all_lengths_one then
+          update_row updated_row (run.start_pos - 1) White
         else
-          acc_range
+          updated_row
       else
-        acc_range
-    ) row run_ranges
+        updated_row
+    in
+
+    if run.end_pos < List.length row - 1 then
+      let covering_runs = runs_covering_cell run.end_pos run in
+      let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
+      if covering_runs != [] && all_lengths_one then
+        update_row updated_row (run.end_pos + 1) White
+      else
+        updated_row
+    else
+      updated_row
+  ) row run_ranges
+
 
 (* Rule 1.4: Prevent over-expanding black segments *)
 let rule_1_4 run_ranges row =
@@ -217,52 +235,154 @@ let rule_2_2 run_ranges row =
   ) run_ranges
 
 
-
 (* Rule 2.3: Refine ranges for overlapping black segments *)
 let rule_2_3 run_ranges row =
   List.map (fun run ->
-      let overlapping_segments =
-        List.fold_left (fun segments i ->
-            if List.nth row i = Black then
-              match segments with
-              | [] -> [(i, i)]
-              | (start, finish) :: rest when i = finish + 1 -> (start, i) :: rest
-              | _ -> (i, i) :: segments
-            else segments
-          ) [] (list_init (run.end_pos - run.start_pos + 1) (fun i -> i + run.start_pos))
+    (* Identify black segments within the range of the current run *)
+    let black_segments =
+      let rec find_segments i current_segment acc =
+        if i > run.end_pos then
+          if current_segment <> [] then List.rev (current_segment :: acc) else List.rev acc
+        else if i < run.start_pos || List.length row <= i then
+          find_segments (i + 1) [] acc
+        else
+          match List.nth row i with
+          | Black -> find_segments (i + 1) (i :: current_segment) acc
+          | _ -> if current_segment <> [] then find_segments (i + 1) [] (current_segment :: acc) else find_segments (i + 1) [] acc
       in
-      List.fold_left (fun refined_run (start, finish) ->
-          if finish - start + 1 > run.length then
-            if start > refined_run.start_pos then { refined_run with end_pos = start - 2 }
-            else if finish < refined_run.end_pos then { refined_run with start_pos = finish + 2 }
-            else refined_run
-          else refined_run
-        ) run overlapping_segments
-    ) run_ranges
+      find_segments run.start_pos [] []
+    in
+
+    (* Refine the range of the run based on black segments *)
+    List.fold_left (fun updated_run segment ->
+      let segment_start = List.hd (List.rev segment) in
+      let segment_end = List.hd segment in
+      let segment_length = segment_end - segment_start + 1 in
+      if segment_length > run.length then
+        (* Determine whether the segment belongs to the former or later black runs *)
+        if segment_start >= updated_run.start_pos && segment_end <= updated_run.end_pos then
+          if segment_start > updated_run.start_pos then
+            { updated_run with start_pos = segment_end + 2 }
+          else if segment_end < updated_run.end_pos then
+            { updated_run with end_pos = segment_start - 2 }
+          else
+            updated_run
+        else
+          updated_run
+      else
+        updated_run
+    ) run black_segments
+  ) run_ranges
+
 
 (* Rule 3.1: Fill gaps between scattered black segments *)
-let rule_3_1 run_ranges row =
-  List.mapi (fun i cell ->
-      if cell = Unknown then
-        let left_black = List.exists (fun run -> run.start_pos <= i && i <= run.end_pos && List.nth row run.start_pos = Black) run_ranges in
-        let right_black = List.exists (fun run -> run.start_pos <= i && i <= run.end_pos && List.nth row run.end_pos = Black) run_ranges in
-        if left_black && right_black then Black else cell
-      else cell
-    ) row
+let rule_3_1 (run_ranges: run_range list) row =
+  List.fold_left (fun (updated_run_ranges, updated_row) (j, run) ->
+    (* Find the first colored cell (Black) after r(j-1)e *)
+    let cm =
+      let rec find_first_black i =
+        if i >= run.end_pos then None
+        else if List.nth updated_row i = Black then Some i
+        else find_first_black (i + 1)
+      in
+      find_first_black (if j > 0 then (List.nth run_ranges (j - 1)).end_pos + 1 else 0)
+    in
+
+    (* Find the last colored cell (Black) before r(j+1)s *)
+    let cn =
+      let rec find_last_black i =
+        if i < run.start_pos then None
+        else if List.nth updated_row i = Black then Some i
+        else find_last_black (i - 1)
+      in
+      find_last_black (if j < List.length run_ranges - 1 then (List.nth run_ranges (j + 1)).start_pos - 1 else List.length row - 1)
+    in
+
+    (* If both cm and cn are found, color all cells between cm and cn *)
+    match (cm, cn) with
+    | Some m, Some n ->
+      let new_row =
+        List.mapi (fun i cell ->
+          if i >= m && i <= n then Black else cell
+        ) row
+      in
+
+      (* Update rj_s and rj_e *)
+      let u = run.length - (n - m + 1) in
+      
+      (updated_run_ranges@[{ run with start_pos = max 0 (m - u);
+                                     end_pos = min (List.length row - 1) (n + u);}]
+      , new_row)
+    | _ -> (updated_run_ranges@[run], row)
+  ) ([], row) (List.mapi (fun i run -> (i, run)) run_ranges)
+
 
 (* Rule 3.2: Skip invalid segments and update ranges *)
 let rule_3_2 run_ranges row =
-  List.map (fun run ->
-      let valid_start = 
-        List.find_opt (fun i -> List.nth row i = Black) (list_init (run.end_pos - run.start_pos + 1) (fun i -> i + run.start_pos))
-      in
-      let valid_end =
-        rev_find_opt (fun i -> List.nth row i = Black) (list_init (run.end_pos - run.start_pos + 1) (fun i -> i + run.start_pos))
-      in
-      match (valid_start, valid_end) with
-      | (Some s, Some e) -> { run with start_pos = s; end_pos = e }
-      | _ -> run
-    ) run_ranges
+  (* Helper function to find segments bounded by empty cells *)
+  let find_segments start_idx end_idx =
+    let rec aux i current_segment segments =
+      if i > end_idx then
+        if current_segment <> [] then List.rev (current_segment :: segments) else List.rev segments
+      else
+        match List.nth row i with
+        | Black -> aux (i + 1) (i :: current_segment) segments
+        | White | Unknown ->
+          if current_segment <> [] then aux (i + 1) [] (current_segment :: segments)
+          else aux (i + 1) [] segments
+    in
+    aux start_idx [] []
+  in
+
+  (* Process each run *)
+  List.fold_left (fun (updated_run_ranges, updated_row) run ->
+    let segments = find_segments run.start_pos run.end_pos in
+    let lbj = run.length in
+
+    (* Step 1 & 2: Find the first segment >= LBj *)
+    let new_start =
+      List.fold_left (fun acc segment ->
+        if acc = None && List.length segment >= lbj then Some (List.hd (List.rev segment))
+        else acc
+      ) None segments
+    in
+
+    (* Step 3 & 4: Find the last segment >= LBj *)
+    let new_end =
+      List.fold_left (fun acc segment ->
+        if acc = None && List.length segment >= lbj then Some (List.hd segment)
+        else acc
+      ) None (List.rev segments)
+    in
+
+    (* Update run range *)
+    let updated_run = {
+      run with
+      start_pos = (match new_start with Some s -> s | None -> run.start_pos);
+      end_pos = (match new_end with Some e -> e | None -> run.end_pos);
+    } in
+
+    (* Step 5: Mark remaining segments < LBj as White *)
+    let updated_row =
+      List.fold_left (fun row segment ->
+        if List.length segment < lbj then
+          let belongs_to_other_runs =
+            List.exists (fun r ->
+              r != run && r.start_pos <= List.hd segment && List.hd segment <= r.end_pos
+            ) updated_run_ranges
+          in
+          if not belongs_to_other_runs then
+            List.mapi (fun i cell -> if List.mem i segment then White else cell) row
+          else
+            row
+        else
+          row
+      ) updated_row segments
+    in
+
+    (updated_run :: updated_run_ranges, updated_row)
+  ) ([], row) (List.rev run_ranges)
+
 
 (* Rule 3.3: Handle non-overlapping ranges *)
 let rule_3_3 run_ranges row =

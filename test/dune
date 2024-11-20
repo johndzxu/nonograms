@@ -7,3 +7,8 @@
  (name rule_2_tests)
  (modules rule_2_tests)
  (libraries rules alcotest))
+
+(test
+ (name rule_3_tests)
+ (modules rule_3_tests)
+ (libraries rules alcotest))
