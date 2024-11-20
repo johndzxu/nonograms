@@ -270,6 +270,24 @@ let apply_logical_rules grid run_ranges =
   in
   iterate grid
 
+
+
+(* 
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*)
+
+
+
+
 let gen_list n e =
   let rec gen' n cont = 
     match n with
@@ -318,9 +336,9 @@ let rec ver_grid nono clues =
 (* Solve with Exceptions and Backtracking *)
 (* Assume you have access to a function that uses the 11 rules for solving nonograms and applies them recursively until there are no more changes, and then a function that fills in gray squares to generate all posible new rows *)
 let solve row_cls col_cls =  
-let rec s_row row_cls col_cls nono = 
+  let rec s_row row_cls col_cls nono = 
     if ver_grid nono col_cls then 
-      let new_nono = apply_rules nono in 
+      let new_nono = apply_logical_rules nono in 
       let children = generate_children new_nono in 
       try_children row_cls col_cls children
     else raise Fail
@@ -331,9 +349,8 @@ let rec s_row row_cls col_cls nono =
         try s_row row_cls col_cls x 
         with Fail -> s_stack row_cls col_cls nono xs
       ) 
-
-;;
-
+  in
+  s_row row_cls col_cls (init_grid (List.length row_cls) (List.length col_cls))
 
 let find_first_row_with_grays nono = 
   let rec find' nono row_id = 
@@ -353,7 +370,7 @@ let rec binary_permutations n =
     let smaller = binary_permutations (n - 1) in
     (* Prepend 0 and 1 to all smaller permutations *)
     List.map (fun l -> White :: l) smaller @ List.map (fun l -> Black :: l) smaller
-  ;;
+;;
 
 (* for a given row replace all the gray with the combo given and insert that into the nono  *)
 let replace_grays row_id combo nono =
@@ -363,23 +380,14 @@ let replace_grays row_id combo nono =
     | x::xs -> if x = Unknown then (List.hd combo)::replace' xs (List.tl combo) else x::replace' xs combo in
   let new_row = replace' (List.nth nono row_id) combo in
   List.mapi (fun i r -> if i = row_id then new_row else r) nono
-  ;;
+;;
 
 (* let insert_rows child_rows nono row_id = 
     List.mapi (fun i r -> if i = row_id then child_rows else r) nono
   ;; *)
 
 let generate_children nono =
-    let row_id = find_first_row_with_grays nono in
-    let gray_combos = binary_permutations (number_of_grays row_id nono) in
-    List.map (fun combo -> replace_grays row_id combo nono) gray_combos
-    (* filter based on row and column clues? *)
-  ;;
-  
-let empty_nono rows cols = 
-  let rec empty' cols = 
-    match cols with 
-    | 0 -> []
-    | _ -> (gen_list rows Unknown)::empty' (cols-1) in
-  empty' cols
-  ;;
+  let row_id = find_first_row_with_grays nono in
+  let gray_combos = binary_permutations (number_of_grays row_id nono) in
+  List.map (fun combo -> replace_grays row_id combo nono) gray_combos
+    (* filter based on row and column clues? *) 
