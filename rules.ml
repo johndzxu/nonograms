@@ -451,6 +451,7 @@ let gen_list n e =
     match n with
     | 0 -> cont []
     | _ -> gen' (n-1) (fun l -> cont (e::l)) in gen' n (fun a -> a) 
+    
 let transpose nono = 
   let len = List.length (List.hd nono) in
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
