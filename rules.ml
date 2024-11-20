@@ -148,8 +148,8 @@ let rule_1_5_part1 run_ranges row =
         | Some rw -> rw - i <= List.fold_left (fun min_len run -> min min_len run.length) max_int run_ranges
         | None -> false
       in
-      let row_with_left = if expand_left && i + 1 < List.length updated_row then update_row updated_row (i + 1) Black else updated_row in
-      let row_with_both = if expand_right && i - 1 >= 0 then update_row row_with_left (i - 1) Black else row_with_left in
+      let row_with_left = if expand_left && i + 1 < List.length updated_row && List.nth updated_row (i + 1) = Unknown then update_row updated_row (i + 1) Black else updated_row in
+      let row_with_both = if expand_right && i - 1 >= 0 && List.nth updated_row (i + 1) = Unknown then update_row row_with_left (i - 1) Black else row_with_left in
       row_with_both
     else
       updated_row
@@ -430,7 +430,7 @@ let apply_rules_row row run_ranges =
     let new_row = rule_1_5_part1 run_ranges new_row in
     let new_row = rule_1_5_part2 run_ranges new_row in
     let new_run_ranges = rule_2_1 run_ranges in
-    let new_run_ranges = rule_2_2 new_run_ranges new_row in
+    (*let new_run_ranges = rule_2_2 new_run_ranges new_row in*)
     let new_run_ranges = rule_2_3 new_run_ranges new_row in
     let (new_run_ranges, new_row) = rule_3_1 new_run_ranges new_row in
   (*  let run_ranges = rule_3_2 run_ranges new_row in
