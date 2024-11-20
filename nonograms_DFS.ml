@@ -102,17 +102,24 @@ let rec binary_permutations n =
     List.map (fun l -> White :: l) smaller @ List.map (fun l -> Black :: l) smaller
   ;;
 
-let replace_grays_with_whites row_id combo nono =
+(* for a given row replace all the gray with the combo given and insert that into the nono  *)
+let replace_grays row_id combo nono =
   let rec replace' row combo = 
     match row with
     | [] -> []
     | x::xs -> if x = Unknown then (List.hd combo)::replace' xs (List.tl combo) else x::replace' xs combo in
-  replace' (List.nth nono row_id) combo
+  let new_row = replace' (List.nth nono row_id) combo in
+  List.mapi (fun i r -> if i = row_id then new_row else r) nono
+  ;;
+
+(* let insert_rows child_rows nono row_id = 
+    List.mapi (fun i r -> if i = row_id then child_rows else r) nono
+  ;; *)
 
 let generate_children nono =
     let row_id = find_first_row_with_grays nono in
     let gray_combos = binary_permutations (number_of_grays row_id nono) in
-    let child_rows = List.map (fun combo -> replace_grays_with_whites row_id combo) gray_combos in
-    children = insert_rows child_rows nono row_id
+    List.map (fun combo -> replace_grays row_id combo nono) gray_combos
+    (* children = insert_rows child_rows nono row_id *)
   ;;
   
