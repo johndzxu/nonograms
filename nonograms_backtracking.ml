@@ -305,23 +305,30 @@ let rec all_rows' clues cols sc =
                                 
 let all_rows clues cols = all_rows' clues cols (fun a -> a) 
     
-let rec ver_col clues col exp =
-  match (clues, col) with
-  | ([],[]) -> true
-  | ([], x::xs) when exp = Black -> false
-  | ([], x::xs) -> (x=White)&&ver_col [] xs White
-  | (x::xs, []) -> false
-  | (cl::cls, c::cs) when exp=Black -> if c = Black then match (cl-1) with
-      | 0 -> ver_col cls cs White 
-      | n -> ver_col (n::cls) cs Black
-      else false
-  | (cl::cls, c::cs) when exp=White -> if c = Black then false else
-        ver_col (cl::cls) cs Unknown
-  | (cl::cls, c::cs) when exp=Unknown -> if c = Black then match (cl-1) with
-      | 0 -> ver_col cls cs White 
-      | n -> ver_col (n::cls) cs Black
-      else ver_col (cl::cls) cs Unknown
-  | _ -> raise Fail
+let rec verify_col (grid: grid) (clues: int list) i =
+  match (clues, grid) with 
+  | ([], []) -> true
+  | ([], _) -> List.for_all (fun x -> (List.nth x i = White || List.nth x i = Unknown)) grid
+  | (_, []) -> false
+  | (h::t, _) -> 
+      if List.nth (List.hd grid) i = Black then 
+        let (firstk, rest) = split h grid in 
+        if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
+          match rest with 
+          | [] -> (clues = [])
+          | r::rows -> if List.nth r i = White || List.nth r i = Unknown then verify_col rows t i else false
+        ) else false 
+      else if List.nth (List.hd grid) i = White then let r::rows = grid in verify_col rows clues i
+      else
+        (
+          let (firstk, rest) = split h grid in 
+          if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
+            match rest with 
+            | [] -> (clues = [])
+            | r::rows -> if List.nth r i  = White || List.nth r i  = Unknown then verify_col rows t i else false
+          ) else false
+        ) || let r::rows = grid in verify_col rows clues i
+;;
            
 let transpose nono = 
   let len = List.length (List.hd nono) in
@@ -330,8 +337,8 @@ let transpose nono =
     
           
 let rec ver_grid nono clues = 
-  let clue_cols = List.map2 (fun clue col -> (clue,col)) clues (transpose nono) in
-  List.for_all (fun (clue, col) -> ver_col clue col Unknown) clue_cols
+  let clue_cols = List.mapi (fun i clue -> verify_col clue col i) clues in
+  List.for_all (fun clue -> clue) clue_cols
   
 (* Solve with Exceptions and Backtracking *)
 (* Assume you have access to a function that uses the 11 rules for solving nonograms and applies them recursively until there are no more changes, and then a function that fills in gray squares to generate all posible new rows *)
@@ -340,14 +347,17 @@ let solve row_cls col_cls =
     if ver_grid nono col_cls then 
       let new_nono = apply_logical_rules nono in 
       let children = generate_children new_nono in 
-      try_children row_cls col_cls children
+      match children with 
+      | [] -> new_nono
+      | _ -> 
+        try_children row_cls col_cls children
     else raise Fail
   and try_children row_cls col_cls children = 
     match children with 
     | [] -> raise Fail
     | x::xs -> (
         try s_row row_cls col_cls x 
-        with Fail -> s_stack row_cls col_cls nono xs
+        with Fail -> try_children row_cls col_cls xs
       ) 
   in
   s_row row_cls col_cls (init_grid (List.length row_cls) (List.length col_cls))

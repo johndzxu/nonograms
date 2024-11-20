@@ -31,30 +31,35 @@ let rev_find_opt predicate lst =
   aux lst
 
 
-let rec verify_col (grid: grid) (clues: int list) i =
-  match clues with 
-  | [] -> List.for_all (fun x -> (List.nth x i = White || List.nth x i = Unknown)) grid
-  | h::t -> 
-      if List.nth (List.hd grid) i = Black then 
-        let (firstk, rest) = split h grid in 
-        if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
-          match rest with 
-          | [] -> (clues = [])
-          | r::rows -> if List.nth r i = White || List.nth r i = Unknown then verify_col rows t i else false
-        ) else false 
-      else if List.nth (List.hd grid) i = White then let r::rows = grid in verify_col rows clues i
-      else
-        (
-          let (firstk, rest) = split h grid in 
-          if List.for_all (fun x -> (List.nth x i = Black || List.nth x i = Unknown)) (firstk) then ( 
-            match rest with 
-            | [] -> (clues = [])
-            | r::rows -> if List.nth r i  = White || List.nth r i  = Unknown then verify_col rows t i else false
-          ) else false
-        ) || let r::rows = grid in verify_col rows clues i
-;;
-
-(* A helper function to initialize a grid with unknown cells *)
+  let rec ver_col clues col exp =
+    match (clues, col) with
+    | ([],[]) -> true
+    | ([], x::xs) when exp = Black -> false
+    | ([], x::xs) -> (x=White)&&ver_col [] xs White
+    | (x::xs, []) -> false
+    | (cl::cls, c::cs) when exp=Black -> if c = Black then match (cl-1) with
+        | 0 -> ver_col cls cs White 
+        | n -> ver_col (n::cls) cs Black
+        else false
+    | (cl::cls, c::cs) when exp=White -> if c = Black then false else
+          ver_col (cl::cls) cs Unknown
+    | (cl::cls, c::cs) when exp=Unknown -> if c = Black then match (cl-1) with
+        | 0 -> ver_col cls cs White 
+        | n -> ver_col (n::cls) cs Black
+        else ver_col (cl::cls) cs Unknown
+    | _ -> raise Fail
+             
+  let transpose nono = 
+    let len = List.length (List.hd nono) in
+    let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
+    in List.map (fun l -> List.rev l) cols
+      
+            
+  let rec ver_grid nono clues = 
+    let clue_cols = List.map2 (fun clue col -> (clue,col)) clues (transpose nono) in
+    List.for_all (fun (clue, col) -> ver_col clue col Unknown) clue_cols
+  
+    (* A helper function to initialize a grid with unknown cells *)
 let init_grid rows cols =
   let rec init_row (row: cell list) (cols: int): cell list =
     match cols with
