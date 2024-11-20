@@ -50,7 +50,7 @@ let rec ver_grid nono clues =
   List.for_all (fun (clue, col) -> ver_col clue col Unknown) clue_cols
   
 (*Solve with Exceptions*)
-let solve row_cls col_cls =
+let solve_dfs row_cls col_cls =
   let width = List.length col_cls in
   
   let rec s_row row_cls nono = 
@@ -69,7 +69,7 @@ let solve row_cls col_cls =
   in s_row row_cls []
   
 (* Solve with fail continuation *)
-let solve_cont row_cls col_cls =
+let solve_dfs_cont row_cls col_cls =
   let width = List.length col_cls in
   
   let rec s_row row_cls nono fc =
@@ -88,7 +88,7 @@ let solve_cont row_cls col_cls =
   in s_row row_cls [] (fun () -> raise Fail)
   
 (*Find ALL solutions with success continuation*)
-let solve_all row_cls col_cls =
+let solve_dfs_all row_cls col_cls =
   let width = List.length col_cls in
   
   let rec s_row row_cls nono (sc: nonogram list -> 'a) : 'a = 
