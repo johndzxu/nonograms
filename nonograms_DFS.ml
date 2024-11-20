@@ -120,6 +120,6 @@ let generate_children nono =
     let row_id = find_first_row_with_grays nono in
     let gray_combos = binary_permutations (number_of_grays row_id nono) in
     List.map (fun combo -> replace_grays row_id combo nono) gray_combos
-    (* children = insert_rows child_rows nono row_id *)
+    (* filter based on row and column clues? *)
   ;;
   
