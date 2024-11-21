@@ -1,8 +1,30 @@
 exception NotImplemented
 exception Fail 
+
+type cell = Black | White | Unknown 
+type row = cell list
+type grid = row list
+
+type run = {start_pos: int; end_pos: int; length: int}
+
   
+(* ------ GIVEN FUNCTIONS ----------*)
+let init_grid rows cols =
+  let rec init_row (row: cell list) (cols: int): cell list =
+    match cols with
+    | 0 -> row
+    | _ -> init_row (Unknown::row) (cols-1)
+  in
+
+  let rec init_grid' (row: cell list) (grid: row list) (rows: int) =
+    match rows with
+    | 0 -> grid
+    | _ -> init_grid' row (row::grid) (rows-1)
+  in
+
+  let row = init_row [] cols in
+  init_grid' row [] rows
   
-    (* ------ GIVEN FUNCTIONS ----------*)
 let gen_list n e =
   let rec gen' n cont = 
     match n with
@@ -52,6 +74,60 @@ let replace_grays row_id combo nono =
 ;;
 
 (* -------- TEMPLATES ----------------*)
+let update_row (row: cell list) (index: int) (value: cell) =
+  List.mapi (fun i cell -> if i = index then value else cell) row
+
+(* Color the intersection of all possible solutions black *)
+let rule_1_1 (row: row) (runs: run list): row =
+  raise NotImplemented
+
+(* Color cells that does not belong to any run ranges white *)
+let rule_1_2 (row: row) (runs: run list): row =
+  raise NotImplemented
+
+(* If first or last cell of a run range is black,
+and all runs covering the cell other than the current run have length one,
+color the cell before or after white *)
+let rule_1_3 (row: cell list) (runs: run list): cell list =
+  raise NotImplemented
+
+(* If the start of a run range is before the start of the previous run range,
+or if the end of a run range is after the end of the next run range,
+  update the run range *)
+let rule_2_1 (row: cell list) (runs: run list): run list =
+  raise NotImplemented
+
+(* Ensure there is a white cell between consecutive black runs *)
+let rule_2_2 (row: cell list) (runs: run list): run list =
+  raise NotImplemented
+
+(* Connect black segments if it belongs to only one run range *)
+let rule_3_1 (row: cell list) (runs: run list): cell list * run list =
+  raise NotImplemented
+
+(* Initialize run ranges given the row clues *)
+let init_runs (row: cell list) (row_cls: int list): run list =
+  raise NotImplemented
+  
+(* Apply rules to a row *)
+let apply_rules_row (row: cell list) (runs: run list): cell list =
+  raise NotImplemented
+  
+(* Apply rules to all rows in a grid *)
+let apply_rules_rows (grid: row list) (cls: int list list): row list = 
+  let runs = (List.map2 init_runs grid cls) in
+  let grid' = (List.map2 apply_rules_row grid runs) in
+  grid'
+  
+(* Apply rules to all rows and columns in a nonogram *)
+let apply_rules (nono: row list) (row_cls: int list list) (col_cls: int list list): row list =
+  let rec iterate nono =
+    let nono' = apply_rules_rows nono row_cls in
+    let nono' = transpose nono' in
+    let nono' = apply_rules_rows nono' col_cls in
+    let nono' = transpose nono' in
+  if nono' = nono then nono else (iterate nono') in
+  iterate nono
 (* Given a single row and associated clues for that row return a boolean true or false based on whether or not that row could be valid. In other words the function should return false if and only if it is impossible for the row to be valid given the associated clues, and true otherwise. 
   verify_row : cell list -> int list -> bool
 *)
