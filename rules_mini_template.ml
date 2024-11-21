@@ -40,27 +40,31 @@ let transpose nono =
 let update_row (row: cell list) (index: int) (value: cell) =
   List.mapi (fun i cell -> if i = index then value else cell) row
 
-(* Intersection of all possibilities *)
+(* Color the intersection of all possible solutions black *)
 let rule_1_1 (row: row) (runs: run list): row =
   raise NotImplemented
 
-(* Does not belong to any run *)
+(* Color cells that does not belong to any run ranges white *)
 let rule_1_2 (row: row) (runs: run list): row =
   raise NotImplemented
 
-(* Covering run are all one *)
+(* If first or last cell of a run range is black,
+and all runs covering the cell other than the current run have length one,
+color the cell before or after white *)
 let rule_1_3 (row: cell list) (runs: run list): cell list =
   raise NotImplemented
 
-(* Eliminate overlaps *)
+(* If the start of a run range is before the start of the previous run range,
+or if the end of a run range is after the end of the next run range,
+  update the run range *)
 let rule_2_1 (row: cell list) (runs: run list): run list =
   raise NotImplemented
 
-(* White cell between runs *)
+(* Ensure there is a white cell between consecutive black runs *)
 let rule_2_2 (row: cell list) (runs: run list): run list =
   raise NotImplemented
 
-(* Connect segments *)
+(* Connect black segments if it belongs to only one run range *)
 let rule_3_1 (row: cell list) (runs: run list): cell list * run list =
   raise NotImplemented
 
