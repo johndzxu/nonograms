@@ -260,14 +260,12 @@ let find_first_row_with_grays nono =
 ;;
 
 let rec binary_permutations n =
-  if n = 0 then [[]] (* Base case: single empty list when n = 0 *)
+  if n = 0 then [[]]
   else
     let smaller = binary_permutations (n - 1) in
-    (* Prepend 0 and 1 to all smaller permutations *)
     List.map (fun l -> Black :: l) smaller @ List.map (fun l -> White :: l) smaller
 ;;
 
-(* for a given row replace all the gray with the combo given and insert that into the nono  *)
 let replace_grays row_id combo nono =
   let rec replace' row combo = 
     match row with
@@ -276,10 +274,6 @@ let replace_grays row_id combo nono =
   let new_row = replace' (List.nth nono row_id) combo in
   List.mapi (fun i r -> if i = row_id then new_row else r) nono
 ;;
-
-(* let insert_rows child_rows nono row_id = 
-    List.mapi (fun i r -> if i = row_id then child_rows else r) nono
-  ;; *)
 
 let generate_children nono row_cls col_cls = 
   let row_id = find_first_row_with_grays nono in
@@ -291,7 +285,6 @@ let generate_children nono row_cls col_cls =
   List.filter (fun child -> (ver_rows_and_cols child row_cls col_cls)) all_children
 
 (* Solve with Exceptions and Backtracking *)
-(* Assume you have access to a function that uses the 11 rules for solving nonograms and applies them recursively until there are no more changes, and then a function that fills in gray squares to generate all posible new rows *)
 let solve_backtracking row_cls col_cls =  
   let rec s_row row_cls col_cls nono = 
     let new_nono = apply_rules nono row_cls col_cls in

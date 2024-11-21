@@ -20,10 +20,9 @@ let transpose nono =
 ;;
 
 let rec binary_permutations n =
-  if n = 0 then [[]] (* Base case: single empty list when n = 0 *)
+  if n = 0 then [[]]
   else
     let smaller = binary_permutations (n - 1) in
-    (* Prepend 0 and 1 to all smaller permutations *)
     List.map (fun l -> Black :: l) smaller @ List.map (fun l -> White :: l) smaller
 ;;
 
@@ -35,7 +34,6 @@ let find_first_row_with_grays nono =
   find' nono 0
 ;;
 
-(* for a given row replace all the gray with the combo given and insert that into the nono  *)
 let replace_grays row_id combo nono =
   let rec replace' row combo = 
     match row with
@@ -45,23 +43,34 @@ let replace_grays row_id combo nono =
   List.mapi (fun i r -> if i = row_id then new_row else r) nono
 ;;
 
+(* Given a single row and associated clues for that row return a boolean true or false based on whether or not that row could be valid. In other words the function should return false if and only if it is impossible for the row to be valid given the associated clues, and true otherwise. 
+  verify_row : cell list -> int list -> bool
+  *)
 let rec verify_row (row: row) (clues: int list) = raise NotImplemented
 
+(* Use verify row and transpose to verify all the columns of a nonogram. return a boolean 
+ver_cols : cell list list -> int list list -> bool
+*)
 let rec ver_cols nono clues = 
   raise NotImplemented
 
+(* verify a nonogram by checking that all the rows and all the columns are valid. return a boolean 
+ver_rows_and_cols : cell list list -> int list list -> int list list -> bool
+*)
 let rec ver_rows_and_cols nono row_cls col_cls = 
   raise NotImplemented
 
-(* let insert_rows child_rows nono row_id = 
-    List.mapi (fun i r -> if i = row_id then child_rows else r) nono
-  ;; *)
 
+(* given a nonogram with some unknown cells generate a list of valid child nonograms by filling in the highest row with unknown cells with all possible valid configuration based on the row clue. Child nonograms must be valid by both row and column. 
+generate_children : cell list list -> int list list -> int list list -> cell list list list
+*)
 let generate_children nono row_cls col_cls = 
   raise NotImplemented
 
 (* Solve with Exceptions and Backtracking *)
-(* Assume you have access to a function that uses the 11 rules for solving nonograms and applies them recursively until there are no more changes, and then a function that fills in gray squares to generate all posible new rows *)
+(* Assume you have access to a function apply_rules grid -> int list list -> int list list that applies the rules recursivley until no more cells change by using the rules. The function should raise exception Fail if there does not exist a valid nonogram, otherwise it should return a valid nonogram. You function must use generate children and exceptions for backtracking. 
+  solve_backtracking : int list list -> int list list -> cell list list
+  *)
 let solve_backtracking row_cls col_cls =  
   raise NotImplemented
 ;;
