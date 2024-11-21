@@ -33,6 +33,8 @@ let transpose nono =
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
   in List.map (fun l -> List.rev l) cols
 
+let update_row row index value =
+  List.mapi (fun i cell -> if i = index then value else cell) row
 (* END *)
 
 (* Intersection of all possibilities *)
@@ -58,6 +60,42 @@ let rule_1_2 row runs =
       then White
     else cell
     ) row
+
+
+let rule_1_3 row runs =
+  let find_covering_runs i exclude_run =
+    List.filter (fun run ->
+      run.start_pos <= i && i <= run.end_pos && run != exclude_run
+    ) runs
+  in
+  List.fold_left (fun row' run ->
+    let row' =
+      if (List.nth row' run.start_pos) != Black
+      then row' else
+      if run.start_pos > 0 then
+        let covering_runs = find_covering_runs run.start_pos run in
+        let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
+        if all_lengths_one then
+          update_row row' (run.start_pos - 1) White
+        else
+          row'
+      else
+        row'
+    in
+
+    if (List.nth row' run.end_pos) != Black
+    then row' else
+    if run.end_pos < List.length row - 1 then
+      let covering_runs = find_covering_runs run.end_pos run in
+      let all_lengths_one = List.for_all (fun r -> r.length = 1) covering_runs in
+      if all_lengths_one then
+        update_row row' (run.end_pos + 1) White
+      else
+        row'
+    else
+      row'
+  ) row runs
+
 
 
 (* Eliminate overlaps *)
@@ -92,6 +130,7 @@ let rule_2_2 row runs =
   ) runs
 
 
+(* Connect segments *)
 let rule_3_1 row runs =
   List.fold_left (fun (row', runs') (j, run) ->
     let cm =
@@ -152,6 +191,7 @@ let apply_rules_r row runs =
   let rec iterate row runs =
     let row' = rule_1_1 row runs in
     let row' = rule_1_2 row' runs in
+    let row' = rule_1_3 row' runs in
     let runs' = rule_2_1 row' runs in
     let runs' = rule_2_2 row' runs' in
     let row', runs' = rule_3_1 row' runs' in
