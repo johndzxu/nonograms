@@ -49,6 +49,7 @@ let rule_1_1 row runs =
         ) row'
     ) row runs
 
+
 (* Does not belong to any run *)
 let rule_1_2 row runs =
   List.mapi (fun i cell ->
@@ -57,6 +58,38 @@ let rule_1_2 row runs =
       then White
     else cell
     ) row
+
+
+(* Eliminate overlaps *)
+let rule_2_1 row runs =
+  List.mapi (fun i run -> 
+    let left_bound =
+      if (i > 0) then
+        (List.nth runs (i - 1)).start_pos + (List.nth runs (i - 1)).length + 1
+      else 0 in
+    let right_bound =
+      if (i < List.length runs - 1) then
+        (List.nth runs (i + 1)).end_pos - (List.nth runs (i + 1)).length - 1
+      else (List.length row - 1) in
+    if (run.start_pos < left_bound)
+      then {run with start_pos = left_bound}
+    else
+    if (run.end_pos > right_bound)
+      then {run with end_pos = right_bound}
+    else run)
+  runs
+
+
+let rule_2_2 row runs =
+  List.map (fun run ->
+    let start' = if run.start_pos > 0 && List.nth row (run.start_pos - 1) = Black
+                  then (run.start_pos + 1)
+                  else (run.start_pos) in
+    let end' = if run.end_pos < (List.length row - 1) && List.nth row (run.end_pos + 1) = Black
+                then run.end_pos - 1
+                else run.end_pos
+    in {run with start_pos = start'; end_pos = end'}
+  ) runs
 
 let init_runs row row_cls =
   let n = List.length row in
@@ -80,22 +113,24 @@ let init_runs row row_cls =
     {start_pos; end_pos; length = clue}
   ) row_cls
 
+
 let apply_rules_r row runs =
   let rec iterate row runs =
     let row' = rule_1_1 row runs in
     let row' = rule_1_2 row' runs in
-    let runs' = runs in
+    let runs' = rule_2_1 row' runs in
+    let runs' = rule_2_2 row' runs' in
     if row' = row && runs' = runs
       then row
       else iterate row' runs'
   in
   iterate row runs
 
+
 let apply_rules_s stack cls = 
   let runs = (List.map2 init_runs stack cls) in
   let new_stack = (List.map2 apply_rules_r stack runs) in
   new_stack
-
 
 
 let apply_rules nono row_cls col_cls =
