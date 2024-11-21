@@ -1,7 +1,12 @@
+type cell = Black | White | Unknown 
+type row = cell list
+type grid = row list
 exception NotImplemented
-exception Fail 
+exception Fail
+exception NoGrays  
   
-  
+type run = {start_pos: int; end_pos: int; length: int}
+
     (* ------ GIVEN FUNCTIONS ----------*)
 let init_grid rows cols =
       let rec init_row (row: cell list) (cols: int): cell list =
@@ -154,23 +159,23 @@ let generate_children nono row_cls col_cls =
   
 (*Solve the nonogram to give exactly 1 valid result with row clues '
 row_cls_ and column clues in 'col_cls' with Exceptions*)
-let solve (row_cls: int list) (col_cls: int list) : nonogram = 
+let solve (row_cls: int list) (col_cls: int list) : grid = 
   
-  let rec s_row (row_cls: int list) (nono: nonogram) = 
+  let rec s_row (row_cls: int list) (nono: grid) = 
     raise NotImplemented
-  and s_stack (row_cls: int list) (nono: nonogram) (stack: nonogram) = 
+  and s_stack (row_cls: int list) (nono: grid) (stack: grid) = 
     raise NotImplemented
     
   in raise NotImplemented
   
 (* Solve the nonogram to give exactly 1 valid result with row clues '
   row_cls_ and column clues in 'col_cls' with a fail continuation*)
-let solve_cont (row_cls: int list) (col_cls: int list) : nonogram = 
+let solve_cont (row_cls: int list) (col_cls: int list) : grid = 
   
-  let rec s_row (row_cls: int list) (nono: nonogram) (fc: unit -> nonogram) : nonogram =
+  let rec s_row (row_cls: int list) (nono: grid) (fc: unit -> grid) : grid =
     raise NotImplemented
       
-  and s_stack (row_cls: int list) (nono: nonogram) (stack: nonogram) (fc: unit -> nonogram) : nonogram =
+  and s_stack (row_cls: int list) (nono: grid) (stack: grid) (fc: unit -> grid) : grid =
     raise NotImplemented 
       
   in raise NotImplemented
@@ -178,10 +183,10 @@ let solve_cont (row_cls: int list) (col_cls: int list) : nonogram =
 (*Find ALL solutions to the given nonogram with a success continuation*)
 let solve_all row_cls col_cls = 
   
-  let rec s_row (row_cls: int list) (nono: nonogram) (sc: nonogram list -> 'a) : 'a = 
+  let rec s_row (row_cls: int list) (nono: grid) (sc: grid list -> 'a) : 'a = 
     raise NotImplemented
       
-  and s_stack (row_cls: int list) (nono: nonogram) (stack: nonogram) (sc: nonogram list -> 'a) : 'a = 
+  and s_stack (row_cls: int list) (nono: grid) (stack: grid) (sc: grid list -> 'a) : 'a = 
     raise NotImplemented 
   
   in raise NotImplemented
