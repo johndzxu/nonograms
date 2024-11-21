@@ -187,7 +187,7 @@ let init_runs row row_cls =
   ) row_cls
 
 
-let apply_rules_r row runs =
+let apply_rules_row row runs =
   let rec iterate row runs =
     let row' = rule_1_1 row runs in
     let row' = rule_1_2 row' runs in
@@ -202,17 +202,17 @@ let apply_rules_r row runs =
   iterate row runs
 
 
-let apply_rules_s stack cls = 
-  let runs = (List.map2 init_runs stack cls) in
-  let new_stack = (List.map2 apply_rules_r stack runs) in
-  new_stack
+let apply_rules_rows grid cls = 
+  let runs = (List.map2 init_runs grid cls) in
+  let grid' = (List.map2 apply_rules_row grid runs) in
+  grid'
 
 
 let apply_rules nono row_cls col_cls =
   let rec iterate nono =
-    let nono' = apply_rules_s nono row_cls in
+    let nono' = apply_rules_rows nono row_cls in
     let nono' = transpose nono' in
-    let nono' = apply_rules_s nono' col_cls in
+    let nono' = apply_rules_rows nono' col_cls in
     let nono' = transpose nono' in
   if nono' = nono then nono else (iterate nono') in
   iterate nono
