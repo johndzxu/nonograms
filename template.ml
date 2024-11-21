@@ -40,21 +40,21 @@ let split index grid =
         else aux (i - 1) (h :: acc) t
   in
   aux index [] grid
-;;
+    
 
 
 let transpose nono = 
   let len = List.length (List.hd nono) in
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
   in List.map (fun l -> List.rev l) cols
-;;
+    
 
 let rec binary_permutations n =
   if n = 0 then [[]]
   else
     let smaller = binary_permutations (n - 1) in
     List.map (fun l -> Black :: l) smaller @ List.map (fun l -> White :: l) smaller
-;;
+      
 
 let find_first_row_with_grays nono = 
   let rec find' nono row_id = 
@@ -62,7 +62,7 @@ let find_first_row_with_grays nono =
     | [] -> raise NoGrays
     | x::xs -> if List.mem Unknown x then row_id else find' xs (row_id+1) in
   find' nono 0
-;;
+    
 
 let replace_grays row_id combo nono =
   let rec replace' row combo = 
@@ -71,7 +71,7 @@ let replace_grays row_id combo nono =
     | x::xs -> if x = Unknown then (List.hd combo)::replace' xs (List.tl combo) else x::replace' xs combo in
   let new_row = replace' (List.nth nono row_id) combo in
   List.mapi (fun i r -> if i = row_id then new_row else r) nono
-;;
+    
 
 (* -------- TEMPLATES ----------------*)
 let update_row (row: cell list) (index: int) (value: cell) =
@@ -126,7 +126,7 @@ let apply_rules (nono: row list) (row_cls: int list list) (col_cls: int list lis
     let nono' = transpose nono' in
     let nono' = apply_rules_rows nono' col_cls in
     let nono' = transpose nono' in
-  if nono' = nono then nono else (iterate nono') in
+    if nono' = nono then nono else (iterate nono') in
   iterate nono
 (* Given a single row and associated clues for that row return a boolean true or false based on whether or not that row could be valid. In other words the function should return false if and only if it is impossible for the row to be valid given the associated clues, and true otherwise. 
   verify_row : cell list -> int list -> bool
@@ -160,7 +160,7 @@ let generate_children nono row_cls col_cls =
   raise NotImplemented 
   
 (*Solve the nonogram to give exactly 1 valid result with row clues '
-  row_cls_ and column clues in 'col_cls' with Exceptions*)
+row_cls_ and column clues in 'col_cls' with Exceptions*)
 let solve (row_cls: int list) (col_cls: int list) : nonogram = 
   
   let rec s_row (row_cls: int list) (nono: nonogram) = 
