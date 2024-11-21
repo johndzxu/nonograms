@@ -3,6 +3,22 @@ exception Fail
   
   
     (* ------ GIVEN FUNCTIONS ----------*)
+let init_grid rows cols =
+      let rec init_row (row: cell list) (cols: int): cell list =
+        match cols with
+        | 0 -> row
+        | _ -> init_row (Unknown::row) (cols-1)
+      in
+    
+      let rec init_grid' (row: cell list) (grid: row list) (rows: int) =
+        match rows with
+        | 0 -> grid
+        | _ -> init_grid' row (row::grid) (rows-1)
+      in
+    
+      let row = init_row [] cols in
+      init_grid' row [] rows
+    
 let gen_list n e =
   let rec gen' n cont = 
     match n with
@@ -19,7 +35,6 @@ let split index grid =
   in
   aux index [] grid
 ;;
-
 
 let transpose nono = 
   let len = List.length (List.hd nono) in

@@ -7,8 +7,7 @@ exception NoGrays
 
 type run = {start_pos: int; end_pos: int; length: int}
 
-(* Functions from elsewhere *)
-(* START *)
+(* ------ GIVEN FUNCTIONS ----------*)
 let init_grid rows cols =
   let rec init_row (row: cell list) (cols: int): cell list =
     match cols with
@@ -31,6 +30,17 @@ let gen_list n e =
     | 0 -> cont []
     | _ -> gen' (n-1) (fun l -> cont (e::l)) in gen' n (fun a -> a) 
     
+let split index grid =
+      let rec aux i acc rest =
+        match rest with
+        | [] -> (List.rev acc, [])
+        | h :: t ->
+            if i = 0 then (List.rev acc, rest)
+            else aux (i - 1) (h :: acc) t
+      in
+      aux index [] grid
+    ;;
+    
 let transpose nono = 
   let len = List.length (List.hd nono) in
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
@@ -38,7 +48,32 @@ let transpose nono =
 
 let update_row row index value =
   List.mapi (fun i cell -> if i = index then value else cell) row
-(* END *)
+
+  let rec binary_permutations n =
+    if n = 0 then [[]]
+    else
+      let smaller = binary_permutations (n - 1) in
+      List.map (fun l -> Black :: l) smaller @ List.map (fun l -> White :: l) smaller
+  ;;
+
+let find_first_row_with_grays nono = 
+    let rec find' nono row_id = 
+      match nono with
+      | [] -> raise NoGrays
+      | x::xs -> if List.mem Unknown x then row_id else find' xs (row_id+1) in
+    find' nono 0
+  ;;
+  
+  
+let replace_grays row_id combo nono =
+    let rec replace' row combo = 
+      match row with
+      | [] -> []
+      | x::xs -> if x = Unknown then (List.hd combo)::replace' xs (List.tl combo) else x::replace' xs combo in
+    let new_row = replace' (List.nth nono row_id) combo in
+    List.mapi (fun i r -> if i = row_id then new_row else r) nono
+  ;;
+  (* END *)
 
 (* Intersection of all possibilities *)
 let rule_1_1 row runs =
@@ -233,17 +268,7 @@ let apply_rules nono row_cls col_cls =
 *
 *)
 
-let split index grid =
-  let rec aux i acc rest =
-    match rest with
-    | [] -> (List.rev acc, [])
-    | h :: t ->
-        if i = 0 then (List.rev acc, rest)
-        else aux (i - 1) (h :: acc) t
-  in
-  aux index [] grid
-;;
-
+(* ------ GIVEN FUNCTIONS ----------*)
 let rec verify_row (row: row) (clues: int list) =
   match (clues, row) with 
   | ([], []) -> true
@@ -285,29 +310,7 @@ let rec ver_rows_and_cols nono row_cls col_cls =
   List.for_all (fun x -> x) verified_cols && List.for_all (fun x -> x) verified_rows
 
   
-let find_first_row_with_grays nono = 
-  let rec find' nono row_id = 
-    match nono with
-    | [] -> raise NoGrays
-    | x::xs -> if List.mem Unknown x then row_id else find' xs (row_id+1) in
-  find' nono 0
-;;
 
-let rec binary_permutations n =
-  if n = 0 then [[]]
-  else
-    let smaller = binary_permutations (n - 1) in
-    List.map (fun l -> Black :: l) smaller @ List.map (fun l -> White :: l) smaller
-;;
-
-let replace_grays row_id combo nono =
-  let rec replace' row combo = 
-    match row with
-    | [] -> []
-    | x::xs -> if x = Unknown then (List.hd combo)::replace' xs (List.tl combo) else x::replace' xs combo in
-  let new_row = replace' (List.nth nono row_id) combo in
-  List.mapi (fun i r -> if i = row_id then new_row else r) nono
-;;
 
 let generate_children nono row_cls col_cls = 
   let row_id = find_first_row_with_grays nono in
