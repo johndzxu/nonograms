@@ -79,7 +79,7 @@ let rule_2_1 row runs =
     else run)
   runs
 
-
+(* White cell between runs *)
 let rule_2_2 row runs =
   List.map (fun run ->
     let start' = if run.start_pos > 0 && List.nth row (run.start_pos - 1) = Black
@@ -90,6 +90,40 @@ let rule_2_2 row runs =
                 else run.end_pos
     in {run with start_pos = start'; end_pos = end'}
   ) runs
+
+
+let rule_3_1 row runs =
+  List.fold_left (fun (row', runs') (j, run) ->
+    let cm =
+      let rec find_first_black i =
+        if i > run.end_pos then None
+        else if List.nth row' i = Black then Some i
+        else find_first_black (i + 1)
+      in
+      find_first_black (if j > 0 then (List.nth runs (j - 1)).end_pos + 1 else 0)
+    in
+    let cn =
+      let rec find_last_black i =
+        if i < run.start_pos then None
+        else if List.nth row' i = Black then Some i
+        else find_last_black (i - 1)
+      in
+      find_last_black (if j < (List.length runs - 1) then (List.nth runs (j + 1)).start_pos - 1 else List.length row - 1)
+    in
+
+    match (cm, cn) with
+    | Some m, Some n ->
+      let row' =
+        List.mapi (fun i cell ->
+          if i >= m && i <= n then Black else cell
+        ) row'
+      in
+      let u = run.length - (n - m + 1) in
+      (row', runs'@[{run with start_pos = max 0 (m - u);
+                    end_pos = min (List.length row - 1) (n + u);}])
+      | _ -> (row', runs'@[run])
+  ) (row, []) (List.mapi (fun i run -> (i, run)) runs)
+
 
 let init_runs row row_cls =
   let n = List.length row in
@@ -120,6 +154,7 @@ let apply_rules_r row runs =
     let row' = rule_1_2 row' runs in
     let runs' = rule_2_1 row' runs in
     let runs' = rule_2_2 row' runs' in
+    let row', runs' = rule_3_1 row' runs' in
     if row' = row && runs' = runs
       then row
       else iterate row' runs'
