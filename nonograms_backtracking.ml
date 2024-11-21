@@ -268,7 +268,6 @@ let rec verify_row (row: row) (clues: int list) =
       ) || verify_row cells clues
            
 
-let transpose nono = 
   let len = List.length (List.hd nono) in
   let cols = List.fold_left (fun cols row -> List.map2 (fun col square -> (square::col)) cols row) (gen_list len []) nono
   in List.map (fun l -> List.rev l) cols
